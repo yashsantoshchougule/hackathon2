@@ -1,0 +1,1 @@
+"""CampusFlow authenticated AI API."""

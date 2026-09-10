@@ -1,32 +1,25 @@
-# React + TypeScript + Vite
+# CampusFlow AI
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Authenticated AI features for CampusFlow: academic assistant, deterministic priority engine,
+confirmation-gated study planner, notice intelligence, evidence-locked study copilot, and typed
+dashboard recommendations.
 
-Currently, two official plugins are available:
+## Local setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Copy `.env.example` to `.env` and fill the Supabase and AI provider values.
+2. Install frontend dependencies with `npm install`.
+3. Create a virtual environment and install `requirements.txt`.
+4. Start the API with `python -m uvicorn api.index:app --reload --port 8000`.
+5. Start React with `npm run dev`.
 
-## React Compiler
+The AI API fails closed when Supabase authentication is not configured. It never substitutes demo
+students or hardcoded academic data. See `docs/ai-integration-contract.md` before integrating the
+database, auth, shared UI, or academic-module branches.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Verification
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```powershell
+npm run lint
+npm run build
+python -m pytest
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
