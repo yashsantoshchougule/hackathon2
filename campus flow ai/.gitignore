@@ -11,6 +11,13 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+supabase/.temp/
+api/.venv/
+__pycache__/
+.pytest_cache/
 
 # Editor directories and files
 .vscode/*
