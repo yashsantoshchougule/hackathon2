@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { PropsWithChildren } from 'react'
 import { supabase } from '../lib/supabase'
 import * as authService from '../services/authService'
+import { clearAcademicAuth, configureAcademicAuth } from '../services/academicApi'
 import { getAppRole, loadProfile } from '../services/profileService'
 import type { AuthContextValue, SignUpInput } from '../types/auth'
 import { authContext } from './AuthContextValue'
@@ -36,6 +37,18 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const signInWithGoogle = useCallback(() => authService.signInWithGoogle(), [])
   const signOut = useCallback(async () => { await authService.signOut() }, [])
   const refreshProfile = useCallback(async () => { if (state.session) await hydrate(state.session) }, [hydrate, state.session])
+
+  useEffect(() => {
+    if (state.session) configureAcademicAuth(async () => state.session?.access_token ?? null)
+    else clearAcademicAuth()
+    return clearAcademicAuth
+  }, [state.session])
+
+  useEffect(() => {
+    const handleExpiredSession = () => { void signOut() }
+    window.addEventListener('campusflow:session-expired', handleExpiredSession)
+    return () => window.removeEventListener('campusflow:session-expired', handleExpiredSession)
+  }, [signOut])
 
   return <authContext.Provider value={useMemo(() => ({ ...state, signIn, signUp, signInWithGoogle, signOut, refreshProfile }), [state, signIn, signUp, signInWithGoogle, signOut, refreshProfile])}>{children}</authContext.Provider>
 }

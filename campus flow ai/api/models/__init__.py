@@ -1,1 +1,1 @@
-"""Validated request and response contracts for the academic API."""
+"""Validated academic and AI API models."""

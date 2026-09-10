@@ -1,37 +1,21 @@
-# CampusFlow Academics
+# CampusFlow
 
-The CampusFlow academic workspace gives authenticated students a single place to manage assignments, timetable entries, verified examinations, attendance simulations, and reminders.
+CampusFlow combines Supabase authentication, academic tools, and AI-assisted study features.
 
-## Run
+## Local setup
 
-```powershell
-npm.cmd ci
-npm.cmd run dev
-```
-
-The browser client uses same-origin `/api` by default. Set the public `VITE_ACADEMIC_API_URL` only when FastAPI is hosted elsewhere.
-
-## Authentication handoff
-
-The shared AuthContext must connect its verified Supabase access-token getter once:
-
-```ts
-configureAcademicAuth(() => getAccessToken())
-```
-
-The academic client does not keep tokens, fabricate a student, or make direct Supabase calls. Without a verified session it shows a 401 state rather than sample academic data.
+1. Copy `.env.example` to `.env.local` for Vite and provide the backend variables in your deployment environment.
+2. Install frontend dependencies with `npm install`.
+3. Create a virtual environment and install `requirements.txt`.
+4. Start the API with `python -m uvicorn api.index:app --reload --port 8000`.
+5. Start React with `npm run dev`.
 
 ## Verification
 
 ```powershell
-npm.cmd run lint
-npm.cmd run build
+npm run lint
+npm run build
+python -m pytest
 ```
 
-The provided environment has no Python interpreter or `.venv`; after the backend environment is restored, run:
-
-```powershell
-.\.venv\Scripts\python.exe -m pytest tests\backend\academic -q
-```
-
-See [the academic integration contract](docs/academic-integration-contract.md) for FastAPI, Supabase/RLS, notification, dashboard, AI, and schema requirements.
+See `docs/auth-database-contract.md`, `docs/academic-integration-contract.md`, and `docs/ai-integration-contract.md` for integration details.

@@ -16,8 +16,10 @@ dist-ssr
 !.env.example
 supabase/.temp/
 api/.venv/
+.venv/
 __pycache__/
 .pytest_cache/
+*.py[cod]
 
 # Editor directories and files
 .vscode/*

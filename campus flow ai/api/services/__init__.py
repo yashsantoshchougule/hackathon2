@@ -1,1 +1,1 @@
-"""Deterministic, storage-independent academic business rules."""
+"""CampusFlow academic and AI services."""

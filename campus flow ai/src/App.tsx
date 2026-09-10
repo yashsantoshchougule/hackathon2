@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { Route, Routes as RouterRoutes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { AiShell } from './components/ai/AiShell'
+import { EmptyState } from './components/ai/Feedback'
 import { Icon, type IconName } from './components/academic/ui'
 import { ProtectedRoute } from './components/common/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
@@ -6,6 +9,7 @@ import { useAuth } from './hooks/useAuth'
 import { AccessDeniedPage } from './pages/AccessDeniedPage'
 import { AccountSecurityPage } from './pages/AccountSecurityPage'
 import { AcademicHubPage } from './pages/AcademicHubPage'
+import { AssistantPage } from './pages/AssistantPage'
 import { AssignmentDetailsPage } from './pages/AssignmentDetailsPage'
 import { AssignmentsPage } from './pages/AssignmentsPage'
 import { AttendancePage } from './pages/AttendancePage'
@@ -15,11 +19,14 @@ import { ExaminationDetailsPage } from './pages/ExaminationDetailsPage'
 import { ExaminationsPage } from './pages/ExaminationsPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { LoginPage } from './pages/LoginPage'
+import { NoticesPage } from './pages/NoticesPage'
 import { OnboardingPage } from './pages/OnboardingPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
 import { RemindersPage } from './pages/RemindersPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
+import { StudyCopilotPage } from './pages/StudyCopilotPage'
+import { StudyPlannerPage } from './pages/StudyPlannerPage'
 import { TimetablePage } from './pages/TimetablePage'
 import './App.css'
 
@@ -29,7 +36,8 @@ function DashboardLanding() {
 }
 
 function Routes() {
-  switch (window.location.pathname) {
+  const path = useLocation().pathname
+  switch (path) {
     case '/': case '/login': return <LoginPage />
     case '/register': return <RegisterPage />
     case '/forgot-password': return <ForgotPasswordPage />
@@ -40,7 +48,10 @@ function Routes() {
     case '/settings/security': return <AccountSecurityPage />
     case '/access-denied': return <AccessDeniedPage />
     case '/dashboard': return <ProtectedRoute><DashboardLanding /></ProtectedRoute>
-    default: return isAcademicPath(window.location.pathname) ? <ProtectedRoute><AcademicWorkspace /></ProtectedRoute> : <AccessDeniedPage />
+    default:
+      if (isAcademicPath(path)) return <ProtectedRoute><AcademicWorkspace /></ProtectedRoute>
+      if (isAiPath(path)) return <ProtectedRoute><AiWorkspace /></ProtectedRoute>
+      return <AccessDeniedPage />
   }
 }
 
@@ -71,19 +82,35 @@ function isAcademicPath(path: string) {
     || /^\/(assignments|examinations)\/[^/]+$/.test(path)
 }
 
+function isAiPath(path: string) {
+  return ['/assistant', '/planner', '/notices', '/study-copilot'].includes(path)
+    || /^\/(notices|resources)\/[^/]+$/.test(path)
+}
+
+function IntegrationPendingPage() {
+  const { resourceId } = useParams()
+  return <EmptyState title="Resources integration pending" message={resourceId ? 'The verified resource link has been preserved for integration.' : 'The shared resources page is not available.'} />
+}
+
+function AiWorkspace() {
+  return <AiShell><RouterRoutes>
+    <Route path="/assistant" element={<AssistantPage />} />
+    <Route path="/planner" element={<StudyPlannerPage />} />
+    <Route path="/notices" element={<NoticesPage />} />
+    <Route path="/notices/:noticeId" element={<NoticesPage />} />
+    <Route path="/study-copilot" element={<StudyCopilotPage />} />
+    <Route path="/resources/:resourceId" element={<IntegrationPendingPage />} />
+  </RouterRoutes></AiShell>
+}
+
 function AcademicWorkspace() {
-  const [path, setPath] = useState(() => window.location.pathname)
+  const path = useLocation().pathname
+  const navigateTo = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const current = routeFor(path)
-  useEffect(() => {
-    const handlePopState = () => setPath(window.location.pathname)
-    window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
-  }, [])
   const navigate = (href: string) => {
-    if (href === window.location.pathname) return
-    window.history.pushState({}, '', href)
-    setPath(href)
+    if (href === path) return
+    navigateTo(href)
     setSidebarOpen(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
